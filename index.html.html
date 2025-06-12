@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사회 초년생 정보 플랫폼 설문조사 분석</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .chart-section {
+            margin-bottom: 50px;
+        }
+        
+        .chart-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #4a90e2;
+        }
+        
+        .chart-wrapper {
+            height: 400px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .subchart-container {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            overflow: hidden;
+        }
+        
+        .subchart-title {
+            background: #f8f9fa;
+            padding: 15px;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .subchart-wrapper {
+            height: 350px;
+            padding: 20px;
+        }
+        
+        .legend {
+            background: #f8f9fa;
+            padding: 15px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 0.9em;
+        }
+        
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 20px;
+            margin-bottom: 5px;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            margin-right: 8px;
+        }
+        
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .stat-number {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: #4a90e2;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 1em;
+        }
+        
+        .github-footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        @media (max-width: 1024px) {
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .stats-summary {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>사회 초년생 정보 플랫폼 설문조사 분석</h1>
+            <p>고등학생 57명 대상 - 3대 분야별 이해도 분석</p>
+        </div>
+        
+        <div class="stats-summary">
+            <div class="stat-card">
+                <div class="stat-number">57</div>
+                <div class="stat-label">총 응답자</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">아르바이트 이해도 응답</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">89.5%</div>
+                <div class="stat-label">부동산 이해도 응답</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">80.7%</div>
+                <div class="stat-label">금융 이해도 응답</div>
+            </div>
+        </div>
+        
+        <div class="chart-section">
+            <div class="chart-title">3대 분야별 전체 이해도</div>
+            <div class="chart-wrapper">
+                <canvas id="mainChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-section">
+            <div class="chart-title">전체 세부 항목별 이해도 순위</div>
+            <div class="chart-wrapper">
+                <canvas id="allItemsChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-grid">
+            <div class="subchart-container">
+                <div class="subchart-title">💼 아르바이트 및 취직 이해도</div>
+                <div class="subchart-wrapper">
+                    <canvas id="jobChart"></canvas>
+                </div>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #a8c8f5"></div>
+                        <span>아르바이트 종류 (51명 이해)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #7bb3f0"></div>
+                        <span>구직 방법 (34명 이해)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #b3d9ff"></div>
+                        <span>관련 법규 (30명 이해)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #cce7ff"></div>
+                        <span>고용 형태 (26명 이해)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #e6f3ff"></div>
+                        <span>면접 준비 (14명 이해)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #f0f8ff"></div>
+                        <span>직무 이해도 (13명 이해)</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="subchart-container">
+                <div class="subchart-title">🏠 부동산 및 주거 이해도</div>
+                <div class="subchart-wrapper">
+                    <canvas id="realEstateChart"></canvas>
+                </div>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ffb3ba"></div>
+                        <span>주거 형태 (49명 이해)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ffc9c9"></div>
+                        <span>부동산 투자 (19명 이해)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ffdbdb"></div>
+                        <span>관련 법규 (9명 이해)</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="subchart-container">
+                <div class="subchart-title">💰 금융 및 투자 이해도</div>
+                <div class="subchart-wrapper">
+                    <canvas id="financeChart"></canvas>
+                </div>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #b3ffb3"></div>
+                        <span>금융 상품 (34명 이해)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ccffcc"></div>
+                        <span>신용 관리 (29명 이해)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #e6ffe6"></div>
+                        <span>대출 제도 (23명 이해)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-section">
+            <div class="chart-title">🔍 가장 이해도가 낮은 항목들</div>
+            <div class="chart-wrapper">
+                <canvas id="lowUnderstandingChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="github-footer">
+            <p>📊 Interactive Survey Dashboard | Powered by Chart.js & GitHub Pages</p>
+        </div>
+    </div>
+    
+    <script>
+        // 차트가 로드되기 전에 차트 컨테이너가 준비될 때까지 기다림
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // 메인 차트 - 3대 분야별 이해도
+            const mainCtx = document.getElementById('mainChart').getContext('2d');
+            new Chart(mainCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['아르바이트 및 취직', '부동산 및 주거', '금융 및 투자'],
+                    datasets: [{
+                        data: [57, 51, 46],
+                        backgroundColor: '#87ceeb',
+                        borderColor: '#6bb6dd',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = 57;
+                                    const understood = context.parsed.y;
+                                    const percentage = ((understood / total) * 100).toFixed(1);
+                                    return `${understood}명 응답 (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 60,
+                            grid: { 
+                                color: '#e0e0e0',
+                                drawBorder: false
+                            },
+                            ticks: { 
+                                font: { size: 12 },
+                                color: '#666',
+                                callback: function(value) {
+                                    return value + '명';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { 
+                                font: { size: 12 },
+                                color: '#666'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 전체 세부 항목별 이해도 순위 (낮은 순으로 정렬)
+            const allItemsCtx = document.getElementById('allItemsChart').getContext('2d');
+            new Chart(allItemsCtx, {
+                type: 'bar',
+                data: {
+                    labels: [
+                        '부동산 법규',
+                        '직무 이해도',
+                        '면접 준비',
+                        '부동산 투자',
+                        '대출 제도',
+                        '고용 형태',
+                        '신용 관리',
+                        '관련 법규',
+                        '구직 방법',
+                        '금융 상품',
+                        '주거 형태',
+                        '아르바이트 종류'
+                    ],
+                    datasets: [{
+                        data: [9, 13, 14, 19, 23, 26, 29, 30, 34, 34, 49, 51],
+                        backgroundColor: function(context) {
+                            const value = context.parsed.y;
+                            if (value <= 15) return '#ffb3ba'; // 매우 낮음 - 연한 분홍
+                            if (value <= 25) return '#ffdfba'; // 낮음 - 연한 주황
+                            if (value <= 35) return '#ffffba'; // 보통 - 연한 노랑
+                            return '#baffc9'; // 높음 - 연한 초록
+                        },
+                        borderColor: '#87ceeb',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = 57;
+                                    const understood = context.parsed.y;
+                                    const notUnderstood = total - understood;
+                                    const percentage = ((notUnderstood / total) * 100).toFixed(1);
+                                    return `${understood}명 이해 (${notUnderstood}명이 잘 모름)`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 60,
+                            grid: { 
+                                color: '#e0e0e0',
+                                drawBorder: false
+                            },
+                            ticks: { 
+                                font: { size: 12 },
+                                color: '#666',
+                                callback: function(value) {
+                                    return value + '명';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { 
+                                font: { size: 10 },
+                                color: '#666',
+                                maxRotation: 45
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 아르바이트 세부 차트 (이해도 낮은 순으로 정렬)
+            const jobCtx = document.getElementById('jobChart').getContext('2d');
+            new Chart(jobCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['직무 이해도', '면접 준비', '고용 형태', '관련 법규', '구직 방법', '아르바이트 종류'],
+                    datasets: [{
+                        data: [13, 14, 26, 30, 34, 51],
+                        backgroundColor: [
+                            '#f0f8ff', // 가장 낮음
+                            '#e6f3ff',
+                            '#cce7ff',
+                            '#b3d9ff',
+                            '#7bb3f0', 
+                            '#a8c8f5'  // 가장 높음
+                        ],
+                        borderColor: '#87ceeb',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = 57;
+                                    const understood = context.parsed.y;
+                                    const notUnderstood = total - understood;
+                                    return `${understood}명 이해 (${notUnderstood}명이 잘 모름)`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 60,
+                            grid: { 
+                                color: '#e0e0e0',
+                                drawBorder: false
+                            },
+                            ticks: { 
+                                font: { size: 11 },
+                                color: '#666',
+                                callback: function(value) {
+                                    return value + '명';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { 
+                                font: { size: 9 },
+                                color: '#666',
+                                maxRotation: 45
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 부동산 세부 차트 (이해도 낮은 순으로 정렬)
+            const realEstateCtx = document.getElementById('realEstateChart').getContext('2d');
+            new Chart(realEstateCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['관련 법규', '부동산 투자', '주거 형태'],
+                    datasets: [{
+                        data: [9, 19, 49],
+                        backgroundColor: [
+                            '#ffdbdb', // 가장 낮음
+                            '#ffc9c9',
+                            '#ffb3ba'  // 가장 높음
+                        ],
+                        borderColor: '#ffb3ba',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = 57;
+                                    const understood = context.parsed.y;
+                                    const notUnderstood = total - understood;
+                                    return `${understood}명 이해 (${notUnderstood}명이 잘 모름)`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 60,
+                            grid: { 
+                                color: '#e0e0e0',
+                                drawBorder: false
+                            },
+                            ticks: { 
+                                font: { size: 11 },
+                                color: '#666',
+                                callback: function(value) {
+                                    return value + '명';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { 
+                                font: { size: 11 },
+                                color: '#666'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 금융 세부 차트 (이해도 낮은 순으로 정렬)
+            const financeCtx = document.getElementById('financeChart').getContext('2d');
+            new Chart(financeCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['대출 제도', '신용 관리', '금융 상품'],
+                    datasets: [{
+                        data: [23, 29, 34],
+                        backgroundColor: [
+                            '#e6ffe6', // 가장 낮음
+                            '#ccffcc',
+                            '#b3ffb3'  // 가장 높음
+                        ],
+                        borderColor: '#b3ffb3',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = 57;
+                                    const understood = context.parsed.y;
+                                    const notUnderstood = total - understood;
+                                    return `${understood}명 이해 (${notUnderstood}명이 잘 모름)`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 60,
+                            grid: { 
+                                color: '#e0e0e0',
+                                drawBorder: false
+                            },
+                            ticks: { 
+                                font: { size: 11 },
+                                color: '#666',
+                                callback: function(value) {
+                                    return value + '명';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { 
+                                font: { size: 11 },
+                                color: '#666'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 가장 이해도가 낮은 항목들
+            const lowUnderstandingCtx = document.getElementById('lowUnderstandingChart').getContext('2d');
+            new Chart(lowUnderstandingCtx, {
+                type: 'bar',
+                data: {
+                    labels: [
+                        '부동산 법규\n(9명만 이해)',
+                        '직무 이해도\n(13명만 이해)', 
+                        '면접 준비\n(14명만 이해)',
+                        '부동산 투자\n(19명만 이해)',
+                        '대출 제도\n(23명만 이해)'
+                    ],
+                    datasets: [{
+                        data: [9, 13, 14, 19, 23],
+                        backgroundColor: [
+                            '#ffb3ba', // 연한 분홍
+                            '#ffdfba', // 연한 복숭아
+                            '#ffffba', // 연한 노랑
+                            '#baffc9', // 연한 민트
+                            '#bae1ff'  // 연한 하늘
+                        ],
+                        borderColor: '#87ceeb',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = 57;
+                                    const understood = context.parsed.y;
+                                    const notUnderstood = total - understood;
+                                    const percentage = ((notUnderstood / total) * 100).toFixed(1);
+                                    return `${understood}명만 이해 (${notUnderstood}명이 잘 모름, ${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 60,
+                            grid: { 
+                                color: '#e0e0e0',
+                                drawBorder: false
+                            },
+                            ticks: { 
+                                font: { size: 12 },
+                                color: '#666',
+                                callback: function(value) {
+                                    return value + '명';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { 
+                                font: { size: 11 },
+                                color: '#666'
+                            }
+                        }
+                    }
+                }
+            });
+            
+        }); // DOMContentLoaded 이벤트 리스너 종료
+    </script>
+</body>
+</html>
